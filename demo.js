@@ -1,9 +1,17 @@
-let data=document.getElementsByClassName("list-group-item")[2];
-console.log(data);
-data.style.backgroundColor="green";
-let element=document.getElementsByTagName("li:last-chile");
-console.log(element);
-let data2=document.getelementByClassName("list-group-item")[1];
-data2.style.backgroundColor="green";
+let itemList=document.querySelector('#items');
+console.log(itemList.parentNode);
+console.log(itemList.lastElementChild);
+console.log(itemList.lastChild);
+console.log(itemList.firstChild);
+console.log(itemList.firstElementChild);
+console.log(itemList.nextSibling);
+console.log(itemList.nextElementSibling);
+console.log(itemList.previousSibling);
+console.log(itemList.previousElementSibling);
+let newDiv =document.createElement("div");
+newDiv.className="hello";
+newDiv.id="hi";
+console.log(newDiv.className);
 
+itemList.appendChild(newDiv);
 

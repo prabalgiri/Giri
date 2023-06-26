@@ -20,4 +20,12 @@ li.className='list-group-item';
 console.log(li);
 li.appendChild(delete-btn);
 
+localStorage.setItem('name','prabal');
+console.log(localStorage.getItem('name'));
+
+sessionStorage.setItem('name','prabal Giri');
+console.log(sessionStorage.getItem('name'));
+
+document.cookie='name=prabal Giri';
+
 

@@ -15,3 +15,9 @@ console.log(newDiv.className);
 
 itemList.appendChild(newDiv);
 
+let li=document.createElement('li');
+li.className='list-group-item';
+console.log(li);
+li.appendChild(delete-btn);
+
+

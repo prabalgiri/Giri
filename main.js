@@ -9,3 +9,4 @@ function addItem(e){
 
     let newItem=document.getElementById(todo);
 }
+console.log(newItem.getInputVlaue();

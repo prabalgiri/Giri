@@ -11,7 +11,6 @@ console.log(itemList.previousElementSibling);
 let newDiv =document.createElement("div");
 newDiv.className="hello";
 newDiv.id="hi";
-console.log(newDiv.className);
 
 itemList.appendChild(newDiv);
 

@@ -1,5 +1,9 @@
-Hi My name is prabal Giri how you doing you good 
-Is it a good thing to handle
-The new branch feature
-are you ok
-.
+const axios = require('axios');
+
+axios.get('https://jsonplaceholder.typicode.com/posts/1')
+  .then(response => {
+    console.log('GET Request Response:', response.data);
+  })
+  .catch(error => {
+    console.error('Error making GET request:', error.message);
+  });

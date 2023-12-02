@@ -1,9 +1,23 @@
-const axios = require('axios');
-
-axios.get('https://jsonplaceholder.typicode.com/posts/1')
-  .then(response => {
-    console.log('GET Request Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error making GET request:', error.message);
+document.addEventListener('DOMContentLoaded', function() {
+  // Attach event listeners to all delete buttons
+  const deleteButtons = document.querySelectorAll('.deleteButton');
+  
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const userId = this.getAttribute('data-user-id');
+      
+      // Make a DELETE request to your server
+      axios.delete(`https://your-api-endpoint/users/${userId}`)
+        .then(response => {
+          // On successful deletion, remove the user detail from the website
+          const userDetailItem = this.closest('li');
+          userDetailItem.remove();
+          
+          console.log('User detail deleted:', response.data);
+        })
+        .catch(error => {
+          console.error('Error deleting user detail:', error.message);
+        });
+    });
   });
+});

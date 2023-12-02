@@ -1,23 +1,52 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Attach event listeners to all delete buttons
-  const deleteButtons = document.querySelectorAll('.deleteButton');
+  const registrationForm = document.getElementById('registrationForm');
+  const userDetailsList = document.getElementById('userDetailsList');
+  const submitBtn = document.getElementById('submitBtn');
   
-  deleteButtons.forEach(button => {
+  // Attach event listeners to all edit buttons
+  const editButtons = document.querySelectorAll('.editButton');
+  
+  editButtons.forEach(button => {
     button.addEventListener('click', function() {
       const userId = this.getAttribute('data-user-id');
       
-      // Make a DELETE request to your server
-      axios.delete(`https://your-api-endpoint/users/${userId}`)
-        .then(response => {
-          // On successful deletion, remove the user detail from the website
-          const userDetailItem = this.closest('li');
-          userDetailItem.remove();
-          
-          console.log('User detail deleted:', response.data);
-        })
-        .catch(error => {
-          console.error('Error deleting user detail:', error.message);
-        });
+      // Get user details using userId and populate the form
+      const userName = /* Fetch user name using userId */;
+      const email = /* Fetch email using userId */;
+
+      registrationForm.elements['userName'].value = userName;
+      registrationForm.elements['email'].value = email;
+
+      // Set a custom attribute on the submit button to track the user being edited
+      submitBtn.setAttribute('data-user-id', userId);
+    });
+  });
+
+  // Handle form submission
+  registrationForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const userId = submitBtn.getAttribute('data-user-id');
+
+    // Use the userId to make a PUT request to update user details
+    const updatedUserName = registrationForm.elements['userName'].value;
+    const updatedEmail = registrationForm.elements['email'].value;
+
+    axios.put(`https://your-api-endpoint/users/${userId}`, {
+      userName: updatedUserName,
+      email: updatedEmail,
+      // Include other fields as needed
+    })
+    .then(response => {
+      // Update the user detail on the website with the new details
+      const userDetailItem = userDetailsList.querySelector(`li[data-user-id="${userId}"]`);
+      userDetailItem.querySelector('span:first-child').textContent = updatedUserName;
+      userDetailItem.querySelector('span:nth-child(2)').textContent = updatedEmail;
+
+      console.log('User detail updated:', response.data);
+    })
+    .catch(error => {
+      console.error('Error updating user detail:', error.message);
     });
   });
 });

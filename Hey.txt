@@ -1,10 +1,27 @@
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello, this is the server!\n');
-  
-  console.log('prabal');
+  // Extract the path from the request URL
+  const path = req.url;
+
+  // Set the content type to JSON
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+
+  // Check the path and return a custom JSON response
+  if (path === '/home') {
+    const response = { message: 'Welcome home' };
+    res.end(JSON.stringify(response));
+  } else if (path === '/about') {
+    const response = { message: 'Welcome to About Us page' };
+    res.end(JSON.stringify(response));
+  } else if (path === '/node') {
+    const response = { message: 'Welcome to my Node.js project' };
+    res.end(JSON.stringify(response));
+  } else {
+    // Default JSON response for other paths
+    const response = { error: 'Invalid path' };
+    res.end(JSON.stringify(response));
+  }
 });
 
 const PORT = 4000;

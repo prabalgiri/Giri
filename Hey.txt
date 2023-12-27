@@ -1,61 +1,13 @@
-const http = require('http');
-const fs = require('fs/promises');
-const { parse } = require('querystring');
-
-const PORT = 4000;
-
-const server = http.createServer(async (req, res) => {
-  if (req.method === 'GET' && req.url === '/') {
-    try {
-      const messages = await readMessages();
-      const html = generateHTML(messages);
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(html);
-    } catch (error) {
-      console.error('Error reading messages:', error);
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('Internal Server Error');
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Process",
+      "port": 9229,
+      "restart": true,
+      "protocol": "inspector"
     }
-  } else if (req.method === 'POST' && req.url === '/add-message') {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-    req.on('end', async () => {
-      const { message } = parse(body);
-      try {
-        await addMessage(message);
-        res.writeHead(302, { 'Location': '/' });
-        res.end();
-      } catch (error) {
-        console.error('Error adding message:', error);
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-      }
-    });
-  } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
-  }
-});
-
-async function readMessages() {
-  try {
-    const content = await fs.readFile('messages.txt', 'utf-8');
-    return content.split('\n').filter(Boolean);
-  } catch (error) {
-    console.error('Error reading messages:', error);
-    throw error;
-  }
-}
-
-async function addMessage(message) {
-  try {
-    const messages = await readMessages();
-    messages.unshift(message);
-    await fs.writeFile('messages.txt', messages.join('\n'));
-  } catch (error) {
-    console.error('Error adding message:', error);
-    throw error;
-  }
+  ]
 }

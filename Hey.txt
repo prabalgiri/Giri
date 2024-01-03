@@ -1,19 +1,26 @@
-const fs = require('fs');
 
-const dataToStore = {
-  name: 'John Doe',
-  age: 25,
-  city: 'Example City',
-};
+const express = require('express');
+const path = require('path');
+const ejs = require('ejs');
 
-const jsonData = JSON.stringify(dataToStore, null, 2); // The third argument (2) is for indentation in JSON.stringify
+const app = express();
 
-const filePath = 'data.json';
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-fs.writeFile(filePath, jsonData, (err) => {
-  if (err) {
-    console.error('Error writing to file:', err);
-  } else {
-    console.log('Data has been written to the file successfully!');
-  }
+// Define a route that renders the EJS template
+app.get('/', (req, res) => {
+  // Data to be passed to the template
+  const data = {
+    title: 'EJS Example',
+    greeting: 'Hello',
+    name: 'John',
+  };
+
+  res.render('index', data);
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

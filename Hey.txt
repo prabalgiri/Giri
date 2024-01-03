@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
@@ -16,15 +15,43 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/add-product', (req, res) => {
-  res.send('<form action="/add-product" method="post"><input type="text" name="product" /><button type="submit">Add Product</button></form>');
+// Admin routes filter
+app.use('/admin', (req, res, next) => {
+  console.log('Admin Filter Middleware');
+  // You can add admin-specific logic/authentication here if needed
+  next();
 });
 
+// Route to display the form
+app.get('/add-product', (req, res) => {
+  res.send('<form action="/add-product" method="post">' +
+    '<label for="productName">Product Name:</label>' +
+    '<input type="text" id="productName" name="product" required /><br>' +
+    '<label for="productSize">Product Size:</label>' +
+    '<input type="text" id="productSize" name="size" required /><br>' +
+    '<button type="submit">Add Product</button>' +
+    '</form>');
+});
 
+// Route to handle form submission
 app.post('/add-product', (req, res) => {
   const productName = req.body.product;
-  console.log(`Product added: ${productName}`);
-  res.redirect('/'); // Redirect to the home page or any other page after form submission
+  const productSize = req.body.size;
+  console.log(`Product added: ${productName} (Size: ${productSize})`);
+  res.redirect('/');
+});
+
+// Admin route
+app.get('/admin/dashboard', (req, res) => {
+  res.send('Admin Dashboard');
+});
+
+// Shop route using a separate file
+app.use('/shop', require('./shop'));
+
+// Page not found handler
+app.use((req, res, next) => {
+  res.status(404).send('Page not found');
 });
 
 const PORT = 3000;

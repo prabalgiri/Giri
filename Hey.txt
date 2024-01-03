@@ -1,22 +1,43 @@
-// cartModel.js
-class Cart {
-  constructor() {
-    this.items = [];
-  }
+// app.js
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const Cart = require('./cartModel');
 
-  addItem(product, quantity) {
-    const existingItem = this.items.find(item => item.product === product);
+const app = express();
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      this.items.push({ product, quantity });
-    }
-  }
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static('public'));
 
-  getItems() {
-    return this.items;
-  }
-}
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-module.exports = Cart;
+// Create a new Cart instance
+const shoppingCart = new Cart();
+
+// Route to display the cart contents
+app.get('/cart', (req, res) => {
+  const cartItems = shoppingCart.getItems();
+  res.render('cart', { cartItems });
+});
+
+// Route to add items to the cart
+app.post('/add-to-cart', (req, res) => {
+  const { product, quantity } = req.body;
+  shoppingCart.addItem(product, parseInt(quantity, 10) || 1);
+  res.redirect('/cart');
+});
+
+// Route to delete items from the cart
+app.post('/delete/:productId', (req, res) => {
+  const productId = req.params.productId;
+  // Assuming product IDs are used as identifiers
+  shoppingCart.deleteItem(productId);
+  res.redirect('/cart');
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

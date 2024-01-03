@@ -1,26 +1,22 @@
+// cartModel.js
+class Cart {
+  constructor() {
+    this.items = [];
+  }
 
-const express = require('express');
-const path = require('path');
-const ejs = require('ejs');
+  addItem(product, quantity) {
+    const existingItem = this.items.find(item => item.product === product);
 
-const app = express();
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      this.items.push({ product, quantity });
+    }
+  }
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+  getItems() {
+    return this.items;
+  }
+}
 
-// Define a route that renders the EJS template
-app.get('/', (req, res) => {
-  // Data to be passed to the template
-  const data = {
-    title: 'EJS Example',
-    greeting: 'Hello',
-    name: 'John',
-  };
-
-  res.render('index', data);
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+module.exports = Cart;

@@ -1,42 +1,19 @@
-// app.js
+const fs = require('fs');
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
+const dataToStore = {
+  name: 'John Doe',
+  age: 25,
+  city: 'Example City',
+};
 
-const app = express();
+const jsonData = JSON.stringify(dataToStore, null, 2); // The third argument (2) is for indentation in JSON.stringify
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static('public'));
+const filePath = 'data.json';
 
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
-
-app.get('/contactus', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'contactus.html'));
-});
-
-app.post('/contactus', (req, res) => {
-  const { name, email, message } = req.body;
-
-  // Validate and process the form data (you can add your validation logic here)
-
-  // For simplicity, let's assume the form submission is successful
-  // and redirect the user to the "/success" route
-  res.redirect('/success');
-});
-
-app.get('/success', (req, res) => {
-  res.send('<h1>Form Submission Successful!</h1>');
-});
-
-app.use((req, res, next) => {
-  res.status(404).sendFile(path.join(__dirname, 'views', 'not-found.html'));
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+fs.writeFile(filePath, jsonData, (err) => {
+  if (err) {
+    console.error('Error writing to file:', err);
+  } else {
+    console.log('Data has been written to the file successfully!');
+  }
 });

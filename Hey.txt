@@ -1,13 +1,28 @@
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "node",
-      "request": "attach",
-      "name": "Attach to Process",
-      "port": 9229,
-      "restart": true,
-      "protocol": "inspector"
-    }
-  ]
-}
+const express = require('express');
+
+// Create an Express application
+const app = express();
+
+// Middleware 1: Logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// Middleware 2: Dummy authentication middleware
+app.use((req, res, next) => {
+  // You can implement your authentication logic here
+  console.log('Dummy Authentication Middleware');
+  next();
+});
+
+// Define a route
+app.get('/', (req, res) => {
+  res.send('Hello, Express!');
+});
+
+// Set up the server to listen on a specific port
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

@@ -1,70 +1,71 @@
-let tasks = [];
+const express = require('express');
+const mysql = require('mysql');
 
-// Function to render tasks
-function renderTasks() {
-  const taskList = document.getElementById('taskList');
-  taskList.innerHTML = '';
+const app = express();
+const port = 3000;
 
-  tasks.forEach((task, index) => {
-    const taskElement = document.createElement('div');
-    taskElement.className = 'task';
+// MySQL Configuration
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'ROOT',
+  password: 'root',
+  database: 'user_management_db',
+});
 
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = task.done;
-    checkbox.addEventListener('change', () => toggleDone(index));
-
-    const taskDetails = document.createElement('div');
-    taskDetails.className = 'task-details';
-
-    const taskName = document.createElement('span');
-    taskName.innerText = task.name;
-
-    const taskDesc = document.createElement('p');
-    taskDesc.innerText = task.description;
-
-    const deleteButton = document.createElement('button');
-    deleteButton.innerText = 'Delete';
-    deleteButton.addEventListener('click', () => deleteTask(index));
-
-    taskDetails.appendChild(taskName);
-    taskDetails.appendChild(taskDesc);
-
-    taskElement.appendChild(checkbox);
-    taskElement.appendChild(taskDetails);
-    taskElement.appendChild(deleteButton);
-
-    taskList.appendChild(taskElement);
-  });
-}
-
-// Function to add a new task
-function addTask() {
-  const newTaskNameInput = document.getElementById('newTaskName');
-  const newTaskDescInput = document.getElementById('newTaskDesc');
-
-  const newName = newTaskNameInput.value.trim();
-  const newDesc = newTaskDescInput.value.trim();
-
-  if (newName !== '' || newDesc !== '') {
-    tasks.push({ name: newName, description: newDesc, done: false });
-    newTaskNameInput.value = '';
-    newTaskDescInput.value = '';
-    renderTasks();
+// Connect to MySQL
+db.connect((err) => {
+  if (err) {
+    console.error('MySQL connection error: ' + err.stack);
+    return;
   }
-}
+  console.log('Connected to MySQL as id ' + db.threadId);
+});
 
-// Function to toggle task done status
-function toggleDone(index) {
-  tasks[index].done = !tasks[index].done;
-  renderTasks();
-}
+// Create database and user table
+db.query(
+  'CREATE DATABASE IF NOT EXISTS user_management_db; USE user_management_db; CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL);',
+  (err, result) => {
+    if (err) throw err;
+    console.log('Database and table created or already exist');
+  }
+);
 
-// Function to delete a task
-function deleteTask(index) {
-  tasks.splice(index, 1);
-  renderTasks();
-}
+// Express middleware to parse JSON
+app.use(express.json());
 
-// Initial rendering
-renderTasks();
+// REST API to add a user
+app.post('/api/users', (req, res) => {
+  const { username, email } = req.body;
+
+  // Insert user into the database
+  db.query(
+    'INSERT INTO users (username, email) VALUES (?, ?)',
+    [username, email],
+    (err, result) => {
+      if (err) {
+        console.error('Error adding user: ' + err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+      }
+      res.status(201).json({ message: 'User added successfully', userId: result.insertId });
+    }
+  );
+});
+
+// REST API to get all users
+app.get('/api/users', (req, res) => {
+  // Retrieve all users from the database
+  db.query('SELECT * FROM users', (err, result) => {
+    if (err) {
+      console.error('Error fetching users: ' + err.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.status(200).json(result);
+  });
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is listening at http://localhost:${port}`);
+});

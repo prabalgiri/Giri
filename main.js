@@ -1,71 +1,48 @@
+// Import required modules
 const express = require('express');
 const mysql = require('mysql');
+const bodyParser = require('body-parser');
 
-const app = express();
-const port = 3000;
-
-// MySQL Configuration
+// Create MySQL connection
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'ROOT',
-  password: 'root',
-  database: 'user_management_db',
+  user: 'root',
+  password: 'ROOT',
+  database: 'expense_tracker'
 });
 
 // Connect to MySQL
 db.connect((err) => {
   if (err) {
-    console.error('MySQL connection error: ' + err.stack);
-    return;
+    throw err;
   }
-  console.log('Connected to MySQL as id ' + db.threadId);
+  console.log('Connected to MySQL database');
 });
 
-// Create database and user table
-db.query(
-  'CREATE DATABASE IF NOT EXISTS user_management_db; USE user_management_db; CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL);',
-  (err, result) => {
-    if (err) throw err;
-    console.log('Database and table created or already exist');
-  }
-);
+// Create Express application
+const app = express();
 
-// Express middleware to parse JSON
-app.use(express.json());
+// Middleware for parsing JSON requests
+app.use(bodyParser.json());
 
-// REST API to add a user
-app.post('/api/users', (req, res) => {
-  const { username, email } = req.body;
+// Endpoint to create a new user
+app.post('/users', (req, res) => {
+  const { username, email, password } = req.body;
+  const INSERT_USER_QUERY = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
 
-  // Insert user into the database
-  db.query(
-    'INSERT INTO users (username, email) VALUES (?, ?)',
-    [username, email],
-    (err, result) => {
-      if (err) {
-        console.error('Error adding user: ' + err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.status(201).json({ message: 'User added successfully', userId: result.insertId });
-    }
-  );
-});
-
-// REST API to get all users
-app.get('/api/users', (req, res) => {
-  // Retrieve all users from the database
-  db.query('SELECT * FROM users', (err, result) => {
+  db.query(INSERT_USER_QUERY, [username, email, password], (err, result) => {
     if (err) {
-      console.error('Error fetching users: ' + err.message);
-      res.status(500).json({ error: 'Internal Server Error' });
-      return;
+      console.error('Error inserting user:', err);
+      res.status(500).send('Error inserting user');
+    } else {
+      console.log('User inserted successfully');
+      res.status(200).send('User inserted successfully');
     }
-    res.status(200).json(result);
   });
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is listening at http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

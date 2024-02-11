@@ -1,43 +1,28 @@
-// app.js
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-const Cart = require('./cartModel');
+// Define an array of numbers
+let numbers: number[] = [1, 2, 3, 4, 5];
 
-const app = express();
+// Define an array of strings
+let fruits: string[] = ["apple", "banana", "orange"];
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static('public'));
+// Define an array of mixed types
+let mixedArray: (number | string)[] = [1, "hello", 3, "world"];
 
-// Set EJS as the view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// Accessing elements in an array
+console.log(numbers[0]); // Output: 1
+console.log(fruits[1]); // Output: banana
 
-// Create a new Cart instance
-const shoppingCart = new Cart();
+// Modifying elements in an array
+numbers[2] = 10;
+console.log(numbers); // Output: [1, 2, 10, 4, 5]
 
-// Route to display the cart contents
-app.get('/cart', (req, res) => {
-  const cartItems = shoppingCart.getItems();
-  res.render('cart', { cartItems });
+// Array length
+console.log(fruits.length); // Output: 3
+
+// Iterating through an array
+fruits.forEach(fruit => {
+    console.log(fruit);
 });
-
-// Route to add items to the cart
-app.post('/add-to-cart', (req, res) => {
-  const { product, quantity } = req.body;
-  shoppingCart.addItem(product, parseInt(quantity, 10) || 1);
-  res.redirect('/cart');
-});
-
-// Route to delete items from the cart
-app.post('/delete/:productId', (req, res) => {
-  const productId = req.params.productId;
-  // Assuming product IDs are used as identifiers
-  shoppingCart.deleteItem(productId);
-  res.redirect('/cart');
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Output:
+// apple
+// banana
+// orange

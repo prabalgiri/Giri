@@ -1,48 +1,36 @@
-// Import required modules
-const express = require('express');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
+import express, { Request, Response } from 'express';
 
-// Create MySQL connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'ROOT',
-  database: 'expense_tracker'
-});
+// Define the todo list as an array
+let todoList: { id: number; task: string }[] = [
+    { id: 1, task: 'Complete assignment' },
+    { id: 2, task: 'Buy groceries' },
+    { id: 3, task: 'Call mom' },
+];
 
-// Connect to MySQL
-db.connect((err) => {
-  if (err) {
-    throw err;
-  }
-  console.log('Connected to MySQL database');
-});
-
-// Create Express application
+// Create an Express application
 const app = express();
 
-// Middleware for parsing JSON requests
-app.use(bodyParser.json());
+// Middleware to parse JSON bodies
+app.use(express.json());
 
-// Endpoint to create a new user
-app.post('/users', (req, res) => {
-  const { username, email, password } = req.body;
-  const INSERT_USER_QUERY = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
+// DELETE endpoint to delete a todo item by ID
+app.delete('/api/todo/:id', (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
 
-  db.query(INSERT_USER_QUERY, [username, email, password], (err, result) => {
-    if (err) {
-      console.error('Error inserting user:', err);
-      res.status(500).send('Error inserting user');
+    // Find the index of the todo item with the given ID
+    const index = todoList.findIndex(todo => todo.id === id);
+
+    // If the todo item with the given ID exists, remove it from the list
+    if (index !== -1) {
+        todoList.splice(index, 1);
+        res.status(200).send(`Todo item with ID ${id} deleted successfully.`);
     } else {
-      console.log('User inserted successfully');
-      res.status(200).send('User inserted successfully');
+        res.status(404).send(`Todo item with ID ${id} not found.`);
     }
-  });
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

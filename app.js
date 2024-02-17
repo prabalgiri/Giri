@@ -1,51 +1,18 @@
-const express = require('express');
-const mysql = require('mysql');
-const path = require('path');
+function login(event){
+    event.preventDefault();
+    console.log(event.target.name);
 
-const app = express();
-const port = 3000;
-
-// MySQL Connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'your_username',
-    password: 'your_password',
-    database: 'your_database',
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL:', err);
-    } else {
-        console.log('Connected to MySQL database');
+    const loginData={
+        email: event.target.value,
+        password:event.target.password.value
     }
-});
-
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
-
-// Routes
-app.get('/', (req, res) => {
-    // Fetch posts from the database
-    db.query('SELECT * FROM posts', (err, results) => {
-        if (err) throw err;
-        res.render('index', { posts: results });
-    });
-});
-
-app.post('/addPost', (req, res) => {
-    const { imageUrl, comment } = req.body;
     
-    // Insert new post into the database
-    db.query('INSERT INTO posts (image_url, comment) VALUES (?, ?)', [imageUrl, comment], (err) => {
-        if (err) throw err;
-        res.redirect('/');
-    });
-});
+     console.log(loginData);
+     axios.post('http://localhost:3000/user/login',loginData).then(response=>{
+     }).catch(err=>{
+        console.log(JSON.stringify(err));
+        document.body.innerHTML+=`<div>${err.message}</div>`
+     })
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+
+}
